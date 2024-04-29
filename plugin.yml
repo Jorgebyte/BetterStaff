@@ -1,0 +1,21 @@
+name: BetterStaff
+api: 5.0.0
+version: 1.0.0
+author: Jorgebyte
+main: Jorgebyte\BetterStaff\Main
+
+permissions:
+  betterstaff.command.staff:
+    default: op
+  betterstaff.command.freeze:
+    default: op
+  betterstaff.staffchat:
+    default: op
+  betterstaff.command.staffchat:
+    default: op
+  betterstaff.command.tempban:
+    default: op
+  betterstaff.command.untempban:
+    default: op
+  betterstaff.command.playerinfo:
+    default: op

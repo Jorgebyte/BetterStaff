@@ -1,0 +1,48 @@
+prefix: "§l§8(§aBetter§fStaff§8)§r "
+
+player-not-online: "§cThe player disconnected"
+staff-death: "§cYou died while in staffmode, your things were returned to the state you entered"
+
+join-staffmode-message: "§aYou have entered Staffmode"
+exit-staffmode-message: "§cYou have exited Staffmode"
+
+# MSG TELEPORT
+teleport-success: "§aYou have been teleported towards the player: {PLAYER}"
+
+# Freezee
+staff-no-freeze: "§cYou cannot freeze this player because he is on staff"
+unfreeze-player: "§aUnfroze player:§e {PLAYER}"
+you-unfreeze: "§aYou have been thawed"
+freeze-player: "§cYou have frozen the player:§e {PLAYER}"
+contact-staff: "§eChat with the staff because you are frozen"
+broadcast-unfreeze: "§7The player:§e {PLAYER} §7was unfrozen by staff:§c {STAFF}"
+broadcast-freeze: "§7The player:§e {PLAYER} §7it was for the staff:§c {STAFF}"
+message-commands-block: "§cYou cannot use this command while frozen"
+frozen-player-attack: "§cYou can't attack while frozen"
+player-attack-frozen: "§cYou cannot attack the frozen player"
+staff-message-defrost: "§eUnfreeze the player with the Freeze item"
+
+# StaffChat
+staffchat-broadcast: "§8(§9StaffChat§8)§e {PLAYER}§7:§b {MSG}"
+join-staffchat: "§7Now you can chat with other staff privately"
+leave-staffchat: "§7You left the staff chat"
+
+# Vanish
+enable-vanish: "§7You have activated the vanish"
+disable-vanish: "§7You have deactivated the vanish"
+
+# Ban
+kick-player-ban: "§cYou were banned by the staff:§e {STAFF} \n§bTime:§a {TIME} §cReason:§7 {REASON}"
+staff-ban-message: "§aYou have banned the player: {PLAYER}\n§bTime:§a {TIME} §cReason:§7 {REASON}"
+invalid-time: "§cInvalid time, use: seconds, minutes, hours, days"
+login-player-ban: "§cYou were banned for:§e {STAFF}\n§bTime:§a {TIME} §cReason:§7 {REASON}"
+player-no-ban: "§e{PLAYER} §7It is not currently banned"
+player-remove-ban: "§e{PLAYER} §7He was banned"
+error-player-check: "§cError when checking player status:§e {PLAYER}"
+player-check: "\n§7--------\n§7Player:§e {PLAYER}\n§7Time:§b {TIME}\n§7Banned by:§c {STAFF}\n§7Reason:§c {REASON}\n§7--------"
+broadcast-ban-message: "§e{PLAYER} §7was banned by the staff:§e {STAFF} \n§7for: §b{TIME}\n§7Reason: §c{REASON}"
+
+# Player Info
+player-info-message: "§7--------\n§7Player:§e {PLAYER}\n§7Input:§a {INPUT}\n§7Device:§a {DEVICE}\n§7DeviceModel:§a {DEVICEMODEL}\n§7Ip:§c {IP}\n§7Ping:§a {PING}\n§7--------"
+
+

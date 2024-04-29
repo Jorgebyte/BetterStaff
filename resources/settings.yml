@@ -1,0 +1,5 @@
+commands-block:
+  - hub
+  - tpa
+  - lobby
+  - ec
