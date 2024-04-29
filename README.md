@@ -1,0 +1,2 @@
+# BetterStaff
+Plugin for pocketmine
