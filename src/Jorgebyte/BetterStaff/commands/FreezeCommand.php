@@ -27,11 +27,10 @@ class FreezeCommand extends Command
             return;
         }
         $victim = Server::getInstance()->getPlayerExact($args[0]);
-        $sender->sendMessage($prefix . (
-            ($victim instanceof Player)
-                ? Utils::toggleFreeze($sender, $victim)
-                : Utils::getConfigValue("messages", "player-not-online")
-            ));
+
+        if ($victim instanceof Player) Utils::toggleFreeze($sender, $victim); else {
+            $sender->sendMessage($prefix . Utils::getConfigValue("messages", "player-not-online"));
+        }
         Utils::addSound($sender, "random.pop");
     }
 }
