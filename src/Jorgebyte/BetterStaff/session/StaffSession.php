@@ -47,20 +47,20 @@ class StaffSession
         $playerName = $player->getName();
 
         if (isset(self::$staffSession[$playerName])) {
-            if (isset(self::$state[$playerName]['inventory']) && isset(self::$state[$playerName]['armor'])) {
-                $player->getInventory()->setContents(self::$state[$playerName]['inventory']);
-                $player->getArmorInventory()->setContents(self::$state[$playerName]['armor']);
-            }
-            if (isset(self::$state[$playerName]['position']) && self::$state[$playerName]['position'] instanceof Position) {
-                $player->teleport(self::$state[$playerName]['position']);
-            }
             $player->getInventory()->clearAll();
             $player->getArmorInventory()->clearAll();
             $player->setGamemode(GameMode::SURVIVAL());
             $player->setFlying(false);
             $player->setAllowFlight(false);
-            unset(self::$staffSession[$playerName]);
-            unset(self::$state[$playerName]);
+            if (isset(self::$state[$playerName]['inventory']) && isset(self::$state[$playerName]['armor'])) {
+                $player->getInventory()->setContents(self::$state[$playerName]['inventory']);
+                $player->getArmorInventory()->setContents(self::$state[$playerName]['armor']);
+                if (isset(self::$state[$playerName]['position']) && self::$state[$playerName]['position'] instanceof Position) {
+                    $player->teleport(self::$state[$playerName]['position']);
+                }
+                unset(self::$staffSession[$playerName]);
+                unset(self::$state[$playerName]);
+            }
         }
     }
 
