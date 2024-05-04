@@ -2,20 +2,19 @@
 
 namespace Jorgebyte\BetterStaff\commands;
 
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\session\StaffSession;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
 class StaffChatCommand extends Command
 {
-    private  $plugin;
 
     public function __construct()
     {
         parent::__construct("staffchat", "BetterStaff - Chat with the other staff", null, ["sc", "schat", "cs"]);
         $this->setPermission("betterstaff.command.staffchat");
-        $this->plugin = Main::getInstance();
     }
     public function execute(CommandSender $sender, string $commandLabel, array $args): void
     {
@@ -23,17 +22,12 @@ class StaffChatCommand extends Command
             $sender->sendMessage("This command can only be used in-game.");
             return;
         }
-        $staffSession = $this->plugin->getStaffSession();
-        $prefix = $this->plugin->getMessages("prefix");
-        $utils = $this->plugin->getUtils();
-        if ($staffSession->isInStaffChat($sender)) {
-            $staffSession->leaveStaffChat($sender);
-            $sender->sendMessage($prefix . $this->plugin->getMessages("leave-staffchat"));
-            $utils->addSound($sender, "random.pop");
-        } else {
-            $staffSession->joinStaffChat($sender);
-            $sender->sendMessage($prefix . $this->plugin->getMessages("join-staffchat"));
-            $utils->addSound($sender, "random.pop");
+        $prefix = Utils::getPrefix();
+        if (StaffSession::isStaffChat($sender)) StaffSession::removeStaffChat($sender); else {
+            StaffSession::registerStaffChat($sender);
         }
+        $messageKey = StaffSession::isStaffChat($sender) ? "join-staffchat" : "leave-staffchat";
+        $sender->sendMessage($prefix . Utils::getConfigValue("messages", $messageKey));
+        Utils::addSound($sender, "random.pop");
     }
 }

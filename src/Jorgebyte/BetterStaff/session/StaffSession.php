@@ -2,92 +2,102 @@
 
 namespace Jorgebyte\BetterStaff\session;
 
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use pocketmine\world\Position;
 
 class StaffSession
 {
 
-    private array $staffSession;
-    private array $inventory;
-    private array $frozenPlayers;
-    private array $staffChat;
-    private array $vanishedPlayers;
+    private static array $staffSession;
+    private static array $state;
+    private static array $frozenPlayers;
+    private static array $staffChat;
+    private static array $vanishedPlayers;
 
-    public function registerStaff(Player $player): void
+    public static function registerStaff(Player $player): void
     {
-        $this->staffSession[$player->getName()] = true;
-        // save inventory
-        $this->inventory[$player->getName()] = array(
+        $playerName = $player->getName();
+
+        self::$staffSession[$playerName] = true;
+        // Save inventory
+        self::$state[$playerName] = [
             "inventory" => $player->getInventory()->getContents(),
-            "armor" => $player->getArmorInventory()->getContents()
-        );
+            "armor" => $player->getArmorInventory()->getContents(),
+            "position" => $player->getPosition()
+        ];
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
         $player->setGamemode(GameMode::SURVIVAL());
         $player->setAllowFlight(true);
         $player->setHealth($player->getMaxHealth());
-        $player->getHungerManager()->setFood($player->getHungerManager()->getMaxFood());
-        Main::getInstance()->getUtils()->setKitStaff($player);
+        $player->getHungerManager()->setFood(20);
+        Utils::setKitStaff($player);
     }
 
-    public function isStaff(Player $player): bool
+    public static function isStaff(Player $player): bool
     {
-        return isset($this->staffSession[$player->getName()]);
+        return isset(self::$staffSession[$player->getName()]);
     }
 
-    public function removeStaff(Player $player): void
+    public static function removeStaff(Player $player): void
     {
-        if (isset($this->staffSession[$player->getName()])) {
+        $playerName = $player->getName();
+
+        if (isset(self::$staffSession[$playerName])) {
+            if (isset(self::$state[$playerName]['inventory']) && isset(self::$state[$playerName]['armor'])) {
+                $player->getInventory()->setContents(self::$state[$playerName]['inventory']);
+                $player->getArmorInventory()->setContents(self::$state[$playerName]['armor']);
+            }
+            if (isset(self::$state[$playerName]['position']) && self::$state[$playerName]['position'] instanceof Position) {
+                $player->teleport(self::$state[$playerName]['position']);
+            }
             $player->getInventory()->clearAll();
             $player->getArmorInventory()->clearAll();
             $player->setGamemode(GameMode::SURVIVAL());
             $player->setFlying(false);
             $player->setAllowFlight(false);
-            // restore inventory
-            $player->getInventory()->setContents($this->inventory[$player->getName()]["inventory"]);
-            $player->getArmorInventory()->setContents($this->inventory[$player->getName()]["armor"]);
-            unset($this->staffSession[$player->getName()]);
-            unset($this->inventory[$player->getName()]);
+            unset(self::$staffSession[$playerName]);
+            unset(self::$state[$playerName]);
         }
     }
 
-    public function freezePlayer(Player $player): void
+    public static function registerFrozen(Player $player): void
     {
-        $this->frozenPlayers[$player->getName()] = true;
+        self::$frozenPlayers[$player->getName()] = true;
     }
 
-    public function isFrozen(Player $player): bool
+    public static function isFrozen(Player $player): bool
     {
-        return isset($this->frozenPlayers[$player->getName()]);
+        return isset(self::$frozenPlayers[$player->getName()]);
     }
 
-    public function removeFrozen(Player $player): void
+    public static function removeFrozen(Player $player): void
     {
-        unset($this->frozenPlayers[$player->getName()]);
+        unset(self::$frozenPlayers[$player->getName()]);
     }
 
-    public function joinStaffChat(Player $player): void
+    public static function registerStaffChat(Player $player): void
     {
-        $this->staffChat[$player->getName()] = true;
+        self::$staffChat[$player->getName()] = true;
     }
 
-    public function isInStaffChat(Player $player): bool
+    public static function isStaffChat(Player $player): bool
     {
-        return isset($this->staffChat[$player->getName()]);
+        return isset(self::$staffChat[$player->getName()]);
     }
 
-    public function leaveStaffChat(Player $player): void
+    public static function removeStaffChat(Player $player): void
     {
-        unset($this->staffChat[$player->getName()]);
+        unset(self::$staffChat[$player->getName()]);
     }
 
-    public function vanish(Player $player): void
+    public static function registervanish(Player $player): void
     {
-        $this->vanishedPlayers[$player->getName()] = true;
-        foreach (Server::getInstance()->getOnlinePlayers()  as $onlinePlayer) {
+        self::$vanishedPlayers[$player->getName()] = true;
+        foreach (Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
             if ($onlinePlayer !== $player) {
                 $onlinePlayer->hidePlayer($player);
                 $player->setSilent(true);
@@ -95,14 +105,14 @@ class StaffSession
         }
     }
 
-    public function isVanish(Player $player): bool
+    public static function isVanish(Player $player): bool
     {
-        return isset($this->vanishedPlayers[$player->getName()]);
+        return isset(self::$vanishedPlayers[$player->getName()]);
     }
 
-    public function unvanish(Player $player): void
+    public static function removevanish(Player $player): void
     {
-        unset($this->vanishedPlayers[$player->getName()]);
+        unset(self::$vanishedPlayers[$player->getName()]);
         foreach (Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
             if ($onlinePlayer !== $player) {
                 $onlinePlayer->showPlayer($player);

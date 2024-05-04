@@ -2,7 +2,8 @@
 
 namespace Jorgebyte\BetterStaff\commands;
 
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\session\StaffSession;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -10,13 +11,10 @@ use pocketmine\player\Player;
 class BetterStaffCommand extends Command
 {
 
-    private $plugin;
-
     public function __construct()
     {
         parent::__construct("betterstaff", "BetterStaff - Start in administrator mode", null, ["staff", "mod"]);
         $this->setPermission("betterstaff.command.staff");
-        $this->plugin = Main::getInstance();
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void
@@ -26,17 +24,14 @@ class BetterStaffCommand extends Command
             return;
         }
 
-        $prefix = $this->plugin->getMessages("prefix");
-        $staffSession = $this->plugin->getStaffSession();
-        $utils = $this->plugin->getUtils();
-        if ($staffSession->isStaff($sender)) {
-            $staffSession->removeStaff($sender);
-            $sender->sendMessage($prefix . $this->plugin->getMessages("exit-staffmode-message"));
-            $utils->addSound($sender, "random.pop");
-        } else {
-            $staffSession->registerStaff($sender);
-            $sender->sendMessage($prefix . $this->plugin->getMessages("join-staffmode-message"));
-            $utils->addSound($sender, "random.pop");
+        if (StaffSession::isStaff($sender)) StaffSession::removeStaff($sender); else {
+            StaffSession::registerStaff($sender);
         }
+
+        $prefix = Utils::getPrefix();
+        $messageKey = StaffSession::isStaff($sender) ? "join-staffmode-message" : "exit-staffmode-message";
+        $message = Utils::getConfigValue("messages", $messageKey);
+        $sender->sendMessage($prefix . $message);
+        Utils::addSound($sender, "random.pop");
     }
 }

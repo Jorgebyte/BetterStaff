@@ -2,7 +2,8 @@
 
 namespace Jorgebyte\BetterStaff\events;
 
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\session\StaffSession;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -11,33 +12,24 @@ use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerDropItemEvent;
-use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\player\Player;
 
 class StaffEvent implements Listener
 {
 
-    public Main $plugin;
-
-    public function __construct()
-    {
-        $this->plugin = Main::getInstance();
-    }
-
     public function onPlayerQuit(PlayerQuitEvent $event): void
     {
         $player = $event->getPlayer();
-        $staffSession = $this->plugin->getStaffSession();
 
-        if ($staffSession->isStaff($player)) {
-            $staffSession->removeStaff($player);
+        if (StaffSession::isStaff($player)) {
+            StaffSession::removeStaff($player);
         }
-        if ($staffSession->isVanish($player)) {
-            $staffSession->unvanish($player);
+        if (StaffSession::isVanish($player)) {
+            StaffSession::removevanish($player);
         }
-        if ($staffSession->isFrozen($player)) {
-            $staffSession->removeFrozen($player);
+        if (StaffSession::isFrozen($player)) {
+            StaffSession::removeFrozen($player);
         }
     }
 
@@ -45,8 +37,8 @@ class StaffEvent implements Listener
     {
         $player = $event->getPlayer();
         $msg = $event->getMessage();
-        if ($this->plugin->getStaffSession()->isInStaffChat($player)) {
-            $this->plugin->getUtils()->broadcastToStaff($player, $msg);
+        if (StaffSession::isStaffChat($player)) {
+            Utils::broadcastToStaff($player, $msg);
             $event->cancel();
         }
     }
@@ -54,7 +46,7 @@ class StaffEvent implements Listener
     public function onPlayerDropItem(PlayerDropItemEvent $event): void
     {
         $player = $event->getPlayer();
-        if ($this->plugin->getStaffSession()->isStaff($player)) {
+        if (StaffSession::isStaff($player)) {
             $event->cancel();
         }
     }
@@ -62,7 +54,7 @@ class StaffEvent implements Listener
     public function onInventoryTransaction(InventoryTransactionEvent $event): void
     {
         $player = $event->getTransaction()->getSource();
-        if ($this->plugin->getStaffSession()->isStaff($player)) {
+        if (StaffSession::isStaff($player)) {
             $event->cancel();
         }
     }
@@ -70,7 +62,7 @@ class StaffEvent implements Listener
     public function onBlockBreak(BlockBreakEvent $event): void
     {
         $player = $event->getPlayer();
-        if ($this->plugin->getStaffSession()->isStaff($player)) {
+        if (StaffSession::isStaff($player)) {
             $event->cancel();
         }
     }
@@ -78,7 +70,7 @@ class StaffEvent implements Listener
     public function onBlockPlace(BlockPlaceEvent $event): void
     {
         $player = $event->getPlayer();
-        if ($this->plugin->getStaffSession()->isStaff($player)) {
+        if (StaffSession::isStaff($player)) {
             $event->cancel();
         }
     }
@@ -87,7 +79,7 @@ class StaffEvent implements Listener
     {
         $entity = $event->getEntity();
         if ($entity instanceof Player) {
-            if ($this->plugin->getStaffSession()->isStaff($entity)) {
+            if (StaffSession::isStaff($entity)) {
                 $event->cancel();
             }
         }
@@ -97,12 +89,11 @@ class StaffEvent implements Listener
     {
         $entity = $event->getEntity();
         if ($entity instanceof Player) {
-            $staffSession = $this->plugin->getStaffSession();
-            if ($staffSession->isStaff($entity)) {
+            if (StaffSession::isStaff($entity)) {
                 $event->setDrops(array());
-                $staffSession->removeStaff($entity);
-                $prefix = $this->plugin->getMessages("prefix");
-                $entity->sendMessage($prefix . $this->plugin->getMessages("staff-death"));
+                StaffSession::removeStaff($entity);
+                $prefix = Utils::getConfigValue("messages", "prefix");
+                $entity->sendMessage($prefix . Utils::getConfigValue("messages", "staff-death"));
             }
         }
     }

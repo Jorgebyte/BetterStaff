@@ -2,22 +2,21 @@
 
 namespace Jorgebyte\BetterStaff\commands;
 
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\Server;
 
 class PlayerInfoCommand extends Command
 {
 
-    public $plugin;
 
     public function __construct()
     {
         parent::__construct("playerinfo", "BetterStaff - Obtain information from a player", null, ["plinfo", "userinfo"]);
         $this->setPermission("betterstaff.command.playerinfo");
         $this->setUsage("Usage: /playerinfo <player>");
-        $this->plugin = Main::getInstance();
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void
@@ -27,18 +26,18 @@ class PlayerInfoCommand extends Command
             return;
         }
 
-        $prefix = $this->plugin->getMessages("prefix");
+        $prefix = Utils::getPrefix();
         if (empty($args)) {
             $sender->sendMessage($prefix . $this->getUsage());
             return;
         }
 
         $playerName = $args[0];
-        $victim = $this->plugin->getServer()->getPlayerExact($playerName);
-        if ($victim instanceof Player) {
-            $this->plugin->getUtils()->getPlayerInfo($sender, $victim);
-        } else {
-            $sender->sendMessage($prefix . $this->plugin->getMessages("player-not-online"));
-        }
+        $victim = Server::getInstance()->getPlayerExact($playerName);
+        $sender->sendMessage($prefix . (
+            ($victim instanceof Player)
+                ? Utils::getPlayerInfo($sender, $victim)
+                : Utils::getConfigValue("messages", "player-not-online")
+            ));
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Jorgebyte\BetterStaff\events;
 
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\data\BanData;
+use Jorgebyte\BetterStaff\session\StaffSession;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -12,28 +14,23 @@ use pocketmine\player\Player;
 
 class PlayerEvent implements Listener
 {
-    public Main $plugin;
-
-    public function __construct()
-    {
-        $this->plugin = Main::getInstance();
-    }
 
     public function onPlayerJoin(PlayerJoinEvent $event): void
     {
         $player = $event->getPlayer();
         $playerName = $player->getName();
-        $banData = $this->plugin->getBanData();
+        $banData = BanData::getInstance();
 
         if ($banData->isBanned($playerName)) {
             $banInfo = $banData->getBanInfo($playerName);
             $endTime = $banInfo['end_time'];
             $remainingTime = $endTime - time();
-            $formatDuration = $banData->formatDuration($remainingTime);
+            $formatDuration = Utils::formatDuration($remainingTime);
             $reason = $banInfo['reason'];
             $staffName = $banInfo['staff_name'];
-            $prefix = $this->plugin->getMessages("prefix");
-            $msg = str_replace(["{STAFF}", "{TIME}", "{REASON}"], [$staffName, $formatDuration, $reason], $prefix . $this->plugin->getMessages("login-player-ban"));
+            $prefix = Utils::getPrefix();
+            $msg = str_replace(["{STAFF}", "{TIME}", "{REASON}"], [$staffName, $formatDuration, $reason],
+                $prefix . Utils::getConfigValue("messages", "login-player-ban"));
             $player->kick($msg);
         }
     }
@@ -41,7 +38,7 @@ class PlayerEvent implements Listener
     public function onPlayerMove(PlayerMoveEvent $event): void
     {
         $player = $event->getPlayer();
-        if ($this->plugin->getStaffSession()->isFrozen($player))
+        if (StaffSession::isFrozen($player))
         {
             $event->cancel();
         }
@@ -50,16 +47,16 @@ class PlayerEvent implements Listener
     public function onCommand(CommandEvent $event): void
     {
         $sender = $event->getSender();
-        $prefix = $this->plugin->getMessages("prefix");
+        $prefix = Utils::getPrefix();
         if (!$sender instanceof Player) {
             return;
         }
-        if ($this->plugin->getStaffSession()->isFrozen($sender)) {
+        if (StaffSession::isFrozen($sender)) {
             $command = strtolower($event->getCommand());
-            $blockedCommands = (array) $this->plugin->getSettings("commands-block");
+            $blockedCommands = (array) Utils::getConfigValue("settings", "commands-block");
             if (in_array($command, $blockedCommands)) {
                 $event->cancel();
-                $sender->sendMessage($prefix . $this->plugin->getMessages("message-commands-block"));
+                $sender->sendMessage($prefix . Utils::getConfigValue("messages", "message-commands-block"));
             }
         }
     }
@@ -68,18 +65,17 @@ class PlayerEvent implements Listener
     {
         $damager = $event->getDamager();
         $entity = $event->getEntity();
-        $prefix = $this->plugin->getMessages("prefix");
+        $prefix = Utils::getPrefix();
         if ($entity instanceof Player && $damager instanceof Player) {
-            $staffSession = $this->plugin->getStaffSession();
-            if ($staffSession->isFrozen($damager)) {
+            if (StaffSession::isFrozen($damager)) {
                 $event->cancel();
-                $damager->sendMessage($prefix . $this->plugin->getMessages("frozen-player-attack"));
+                $damager->sendMessage($prefix . Utils::getConfigValue("messages", "frozen-player-attack"));
                 return;
             }
-            if ($staffSession->isFrozen($entity)) {
-                if (!$staffSession->isStaff($damager)) {
+            if (StaffSession::isFrozen($entity)) {
+                if (!StaffSession::isStaff($damager)) {
                     $event->cancel();
-                    $damager->sendMessage($prefix . $this->plugin->getMessages("player-attack-frozen"));
+                    $damager->sendMessage($prefix . Utils::getConfigValue("messages", "player-attack-frozen"));
                 }
             }
         }

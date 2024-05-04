@@ -8,21 +8,18 @@ use Jorgebyte\BetterStaff\items\PlayerInfoItem;
 use Jorgebyte\BetterStaff\items\TeleportItem;
 use Jorgebyte\BetterStaff\items\VanishItem;
 use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\session\StaffSession;
 use pocketmine\network\mcpe\protocol\types\DeviceOS;
 use pocketmine\network\mcpe\protocol\types\InputMode;
 use pocketmine\player\Player;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
+use pocketmine\Server;
+use pocketmine\utils\Config;
 
 class Utils
 {
-    public Main $plugin;
 
-    public function __construct()
-    {
-        $this->plugin = Main::getInstance();
-    }
-
-    public function addSound(Player $player, string $sound, $volume = 1, $pitch = 1): void
+    public static function addSound(Player $player, string $sound, $volume = 1, $pitch = 1): void
     {
         $packet = new PlaySoundPacket();
         $packet->x = $player->getPosition()->getX();
@@ -34,53 +31,93 @@ class Utils
         $player->getNetworkSession()->sendDataPacket($packet);
     }
 
-    public function setKitStaff(Player $player): void
+    public static function getConfigValue(string $fileName, string $key): mixed
     {
-        $player->getInventory()->setContents(array(
-            0 => new TeleportItem(),
-            2 => new VanishItem(),
-            3 => new FreezeItem(),
-            4 => new BanItem(),
-            6 => new PlayerInfoItem()
-        ));
+        $filePath = Main::getInstance()->getDataFolder() . $fileName . ".yml";
+        $file = new Config($filePath, Config::YAML);
+        return $file->get($key);
     }
 
-    public function toggleFreeze(Player $player, Player $victim): void
+    public static function getPrefix(): string
     {
-        $session = $this->plugin->getStaffSession();
-        $prefix = $this->plugin->getMessages("prefix");
+        return self::getConfigValue("messages", "prefix");
+    }
 
-        if ($session->isStaff($victim)) {
-            $player->sendMessage($prefix . $this->plugin->getMessages("staff-no-freeze"));
+    public static function setKitStaff(Player $player): void
+    {
+        $player->getInventory()->setContents(array(0 => new TeleportItem(), 2 => new VanishItem(), 3 => new FreezeItem(), 4 => new BanItem(), 6 => new PlayerInfoItem()));
+    }
+
+    public static function toggleFreeze(Player $player, Player $victim): void
+    {
+        $prefix = self::getConfigValue("messages", "prefix");
+
+        if (StaffSession::isStaff($victim)) {
+            $player->sendMessage($prefix . self::getConfigValue("messages", "staff-no-freeze"));
             return;
         }
-        if ($session->isFrozen($victim)) {
-            $session->removeFrozen($victim);
-            $player->sendMessage(str_replace("{PLAYER}", $victim->getName(), $prefix . $this->plugin->getMessages("unfreeze-player")));
-            $victim->sendMessage($prefix . $this->plugin->getMessages("you-unfreeze"));
-            $this->plugin->getServer()->broadcastMessage(str_replace(["{PLAYER}", "{STAFF}"], [$victim->getName(), $player->getName()], $prefix . $this->plugin->getMessages("broadcast-unfreeze")));
+        if (StaffSession::isFrozen($victim)) {
+            StaffSession::removeFrozen($victim);
+            $player->sendMessage(str_replace("{PLAYER}", $victim->getName(), $prefix . self::getConfigValue("messages", "unfreeze-player")));
+            $victim->sendMessage($prefix . self::getConfigValue("messages", "you-unfreeze"));
+            Server::getInstance()->broadcastMessage(str_replace(["{PLAYER}", "{STAFF}"], [$victim->getName(), $player->getName()], $prefix . self::getConfigValue("messages", "broadcast-unfreeze")));
         } else {
-            $session->freezePlayer($victim);
-            $player->sendMessage(str_replace("{PLAYER}", $victim->getName(), $prefix . $this->plugin->getMessages("freeze-player")));
-            $victim->sendMessage($prefix . $this->plugin->getMessages("contact-staff"));
-            $this->plugin->getServer()->broadcastMessage(str_replace(["{PLAYER}", "{STAFF}"], [$victim->getName(), $player->getName()], $prefix . $this->plugin->getMessages("broadcast-freeze")));
+            StaffSession::registerFrozen($victim);
+            $player->sendMessage(str_replace("{PLAYER}", $victim->getName(), $prefix . self::getConfigValue("messages", "freeze-player")));
+            $victim->sendMessage($prefix . self::getConfigValue("messages", "contact-staff"));
+            Server::getInstance()->broadcastMessage(str_replace(["{PLAYER}", "{STAFF}"], [$victim->getName(), $player->getName()], $prefix . self::getConfigValue("messages", "broadcast-freeze")));
         }
+    }
+
+    public static function parseTime(string $timeString): int|false
+    {
+        $multipliers = [
+            's' => 1,
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400
+        ];
+
+        $unit = strtolower(substr($timeString, -1));
+        $value = intval(substr($timeString, 0, -1));
+
+        if (isset($multipliers[$unit])) {
+            return $value * $multipliers[$unit];
+        }
+        return false;
+    }
+
+    public static function formatDuration(int $seconds): string
+    {
+        $units = [
+            'd' => floor($seconds / 86400),
+            'h' => floor(($seconds % 86400) / 3600),
+            'm' => floor(($seconds % 3600) / 60),
+            's' => $seconds % 60
+        ];
+
+        $formattedDuration = [];
+        foreach ($units as $unit => $value) {
+            if ($value > 0) {
+                $formattedDuration[] = "$value " . ($unit == 's' ? 'second' . ($value !== 1 ? 's' : '') : $unit);
+            }
+        }
+        return implode(' ', $formattedDuration);
     }
 
     // staffchat
-    public function broadcastToStaff(Player $player, string $message): void
+    public static function broadcastToStaff(Player $player, string $message): void
     {
-        foreach ($this->plugin->getServer()->getOnlinePlayers() as $staffs) {
+        foreach (Server::getInstance()->getOnlinePlayers() as $staffs) {
             if ($staffs->hasPermission("betterstaff.staffchat")) {
-                $formattedMessage = str_replace(["{PLAYER}", "{MSG}"], [$player->getName(), $message], $this->plugin->getMessages("staffchat-broadcast"));
+                $formattedMessage = str_replace(["{PLAYER}", "{MSG}"], [$player->getName(), $message], self::getConfigValue("messages", "staffchat-broadcast"));
                 $staffs->sendMessage($formattedMessage);
-                $this->addSound($player, "random.pop");
             }
         }
     }
 
     // player info utils
-    public function getDevice(Player $player): string
+    public static function getDevice(Player $player): string
     {
         $data = $player->getPlayerInfo()->getExtraData();
         if ($data["DeviceOS"] === DeviceOS::ANDROID && $data["DeviceModel"] === "") {
@@ -106,7 +143,7 @@ class Utils
         };
     }
 
-    public function getInputMode(Player $player): string
+    public static function getInputMode(Player $player): string
     {
         $data = $player->getPlayerInfo()->getExtraData();
         return match ($data["CurrentInputMode"]) {
@@ -118,16 +155,17 @@ class Utils
         };
     }
 
-    public function getPlayerInfo(Player $player, Player $victim): string
+    public static function getPlayerInfo(Player $player, Player $victim): string
     {
         $name = $victim->getName();
-        $input = $this->getInputMode($victim);
-        $device = $this->getDevice($victim);
+        $input = self::getInputMode($victim);
+        $device = self::getDevice($victim);
         $deviceModel = $victim->getPlayerInfo()->getExtraData()["DeviceModel"];
         $ip = $victim->getNetworkSession()->getIp();
         $ping = $victim->getNetworkSession()->getPing();
 
-        $info = str_replace(["{PLAYER}", "{INPUT}", "{DEVICE}", "{DEVICEMODEL}", "{IP}", "{PING}"], [$name, $input, $device, $deviceModel, $ip, $ping], $this->plugin->getMessages("player-info-message"));
+        $info = str_replace(["{PLAYER}", "{INPUT}", "{DEVICE}", "{DEVICEMODEL}", "{IP}", "{PING}"], [$name, $input, $device, $deviceModel, $ip, $ping],
+            subject: self::getConfigValue("messages", "player-info-message"));
         $player->sendMessage($info);
         return $info;
     }

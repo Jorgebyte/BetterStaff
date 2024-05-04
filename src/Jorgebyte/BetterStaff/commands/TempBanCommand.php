@@ -2,57 +2,58 @@
 
 namespace Jorgebyte\BetterStaff\commands;
 
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\data\BanData;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\Server;
 
 class TempBanCommand extends Command
 {
-
-    public $plugin;
 
     public function __construct()
     {
         parent::__construct("tempban", "Temporarily ban a player", null, ["tban"]);
         $this->setPermission("betterstaff.command.tempban");
         $this->setUsage("Usage: /tempban <player> <time> <reason>");
-        $this->plugin = Main::getInstance();
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void
     {
-        $prefix = $this->plugin->getMessages("prefix");
-        $utils = $this->plugin->getUtils();
+        $prefix = Utils::getPrefix();
         if (count($args) < 3) {
             $sender->sendMessage($prefix . $this->getUsage());
-            $utils->addSound($sender, "note.bass");
+            Utils::addSound($sender, "note.bass");
             return;
         }
 
         $playerName = array_shift($args);
         $timeString = array_shift($args);
         $reason = implode(" ", $args);
-        $time = $this->plugin->getBanData()->parseTime($timeString);
+        $time = Utils::parseTime($timeString);
         if ($time === false || $time <= 0) {
-            $sender->sendMessage($prefix . $this->plugin->getMessages("invalid-time"));
-            $utils->addSound($sender, "note.bass");
+            $sender->sendMessage($prefix . Utils::getConfigValue("messages", "invalid-time"));
+            Utils::addSound($sender, "note.bass");
             return;
         }
 
-        $target = $this->plugin->getServer()->getPlayerExact($playerName);
+        $target = Server::getInstance()->getPlayerExact($playerName);
         if ($target === null) {
-            $sender->sendMessage($prefix . $this->plugin->getMessages("player-not-online"));
-            $utils->addSound($sender, "note.bass");
+            $sender->sendMessage($prefix . Utils::getConfigValue("messages", "player-not-online"));
+            Utils::addSound($sender, "note.bass");
             return;
         }
 
         $staffName = $sender->getName();
-        $banData = $this->plugin->getBanData();
+        $banData = BanData::getInstance();
         $banData->addBan($target->getName(), $time, $reason, $staffName);
-        $formatDuration = $banData->formatDuration($time);
-        $target->kick(str_replace(["{STAFF}", "{TIME}", "{REASON}"], [$staffName, $formatDuration, $reason], $prefix . $this->plugin->getMessages("kick-player-ban")));
-        $sender->sendMessage(str_replace(["{PLAYER}", "{TIME}", "{REASON}"], [$playerName, $formatDuration, $reason], $prefix . $this->plugin->getMessages("staff-ban-message")));
-        $this->plugin->getServer()->broadcastMessage(str_replace(["{PLAYER}", "{STAFF}", "{TIME}", "{REASON}"], [$playerName, $staffName, $formatDuration, $reason], $prefix . $this->plugin->getMessages("broadcast-ban-message")));
-        $utils->addSound($sender, "random.pop");
+        $formatDuration = Utils::formatDuration($time);
+        $target->kick(str_replace(["{STAFF}", "{TIME}", "{REASON}"], [$staffName, $formatDuration, $reason],
+            $prefix . Utils::getConfigValue("messages", "kick-player-ban")));
+        $sender->sendMessage(str_replace(["{PLAYER}", "{TIME}", "{REASON}"], [$playerName, $formatDuration, $reason],
+            $prefix . Utils::getConfigValue("messages", "staff-ban-message")));
+        Server::getInstance()->broadcastMessage(str_replace(["{PLAYER}", "{STAFF}", "{TIME}", "{REASON}"], [$playerName, $staffName, $formatDuration, $reason],
+            $prefix . Utils::getConfigValue("messages", "broadcast-ban-message")));
+        Utils::addSound($sender, "random.pop");
     }
 }

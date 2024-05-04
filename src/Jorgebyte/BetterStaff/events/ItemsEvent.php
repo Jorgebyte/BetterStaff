@@ -2,12 +2,14 @@
 
 namespace Jorgebyte\BetterStaff\events;
 
+use Jorgebyte\BetterStaff\Forms;
 use Jorgebyte\BetterStaff\items\BanItem;
 use Jorgebyte\BetterStaff\items\FreezeItem;
 use Jorgebyte\BetterStaff\items\PlayerInfoItem;
 use Jorgebyte\BetterStaff\items\TeleportItem;
 use Jorgebyte\BetterStaff\items\VanishItem;
-use Jorgebyte\BetterStaff\Main;
+use Jorgebyte\BetterStaff\session\StaffSession;
+use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerItemUseEvent;
@@ -15,37 +17,30 @@ use pocketmine\player\Player;
 
 class ItemsEvent implements Listener
 {
-    public Main $plugin;
-
-    public function __construct()
-    {
-        $this->plugin = Main::getInstance();
-    }
 
     public function onPlayerUse(PlayerItemUseEvent $event): void
     {
         $player = $event->getPlayer();
         $item = $event->getItem();
-        $session = $this->plugin->getStaffSession();
-        $prefix = $this->plugin->getMessages("prefix");
-        if ($session->isStaff($player)) {
+        $prefix = Utils::getConfigValue("messages", "prefix");
+        if (StaffSession::isStaff($player)) {
             switch (true) {
                 case $item instanceof TeleportItem:
-                    $this->plugin->getForms()->teleportUI($player);
+                    Forms::teleportUI($player);
                     break;
                 case $item instanceof FreezeItem:
-                    $this->plugin->getForms()->freezeUI($player);
+                    Forms::freezeUI($player);
                     break;
                 case $item instanceof BanItem:
-                    $this->plugin->getForms()->customBanUI($player);
+                    Forms::customBanUI($player);
                     break;
                 case $item instanceof VanishItem:
-                    if ($session->isVanish($player)) {
-                        $session->unvanish($player);
-                        $player->sendMessage($prefix . $this->plugin->getMessages("disable-vanish"));
+                    if (StaffSession::isVanish($player)) {
+                        StaffSession::removevanish($player);
+                        $player->sendMessage($prefix . Utils::getConfigValue("messages", "disable-vanish"));
                     } else {
-                        $session->vanish($player);
-                        $player->sendMessage($prefix . $this->plugin->getMessages("enable-vanish"));
+                        StaffSession::registervanish($player);
+                        $player->sendMessage($prefix . Utils::getConfigValue("messages", "enable-vanish"));
                     }
                     break;
             }
@@ -62,9 +57,9 @@ class ItemsEvent implements Listener
         }
         $itemInHand = $damager->getInventory()->getItemInHand();
         if ($itemInHand instanceof FreezeItem) {
-            $this->plugin->getUtils()->toggleFreeze($damager, $victim);
+            Utils::toggleFreeze($damager, $victim);
         } elseif ($itemInHand instanceof PlayerInfoItem) {
-            $this->plugin->getutils()->getPlayerInfo($damager, $victim);
+            Utils::getPlayerInfo($damager, $victim);
         }
     }
 }

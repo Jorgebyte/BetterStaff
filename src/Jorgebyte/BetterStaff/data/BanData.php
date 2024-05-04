@@ -3,17 +3,19 @@
 namespace Jorgebyte\BetterStaff\data;
 
 use Jorgebyte\BetterStaff\Main;
+use pocketmine\utils\SingletonTrait;
 use SQLite3;
 
 class BanData
 {
+    use SingletonTrait;
 
     private $database;
     private $bans;
 
-    public function __construct(Main $plugin)
+    public function __construct()
     {
-        $this->database = new SQLite3($plugin->getDataFolder() . "bans.db");
+        $this->database = new SQLite3(Main::getInstance()->getDataFolder() . "bans.db");
         $this->database->exec("CREATE TABLE IF NOT EXISTS bans (player_name TEXT PRIMARY KEY, end_time INTEGER, reason TEXT, staff_name TEXT)");
         $this->loadBans();
     }
@@ -57,41 +59,5 @@ class BanData
                 'staff_name' => $row['staff_name']
             ];
         }
-    }
-
-    public function parseTime(string $timeString): int|false
-    {
-        $multipliers = [
-            's' => 1,
-            'm' => 60,
-            'h' => 3600,
-            'd' => 86400
-        ];
-
-        $unit = strtolower(substr($timeString, -1));
-        $value = intval(substr($timeString, 0, -1));
-
-        if (isset($multipliers[$unit])) {
-            return $value * $multipliers[$unit];
-        }
-        return false;
-    }
-
-    public function formatDuration(int $seconds): string
-    {
-        $units = [
-            'd' => floor($seconds / 86400),
-            'h' => floor(($seconds % 86400) / 3600),
-            'm' => floor(($seconds % 3600) / 60),
-            's' => $seconds % 60
-        ];
-
-        $formattedDuration = [];
-        foreach ($units as $unit => $value) {
-            if ($value > 0) {
-                $formattedDuration[] = "$value " . ($unit == 's' ? 'second' . ($value !== 1 ? 's' : '') : $unit);
-            }
-        }
-        return implode(' ', $formattedDuration);
     }
 }
