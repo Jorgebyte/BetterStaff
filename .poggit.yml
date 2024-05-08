@@ -5,4 +5,5 @@ branches:
 projects:
   BetterStaff:
     path: ""
+    icon: "icon.png"
 ...
