@@ -45,4 +45,12 @@ broadcast-ban-message: "§e{PLAYER} §7was banned by the staff:§e {STAFF} \n§7
 # Player Info
 player-info-message: "§7--------\n§7Player:§e {PLAYER}\n§7Input:§a {INPUT}\n§7Device:§a {DEVICE}\n§7DeviceModel:§a {DEVICEMODEL}\n§7Ip:§c {IP}\n§7Ping:§a {PING}\n§7--------"
 
+# Report
+report-staff-success: "§7--------\n§e{PLAYER}§7 has reported to §c{REPORTED} by:§c {REASON}\n§7--------"
+
+# StaffList
+stafflist-list: "§6Staffs Online: ({STAFFS})§7"
+no-staff-online: "§cThere are no staff members online."
+
+
 
