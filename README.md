@@ -1,2 +1,6 @@
 # BetterStaff
-Plugin for pocketmine
+
+* Temporary Bans
+* Reporting system with webhook
+* Freezing system
+
