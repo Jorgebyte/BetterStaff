@@ -9,6 +9,9 @@ use Jorgebyte\BetterStaff\items\TeleportItem;
 use Jorgebyte\BetterStaff\items\VanishItem;
 use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\session\StaffSession;
+use Jorgebyte\BetterStaff\utils\webhook\DiscordWebhook;
+use Jorgebyte\BetterStaff\utils\webhook\Embed;
+use Jorgebyte\BetterStaff\utils\webhook\Message;
 use pocketmine\network\mcpe\protocol\types\DeviceOS;
 use pocketmine\network\mcpe\protocol\types\InputMode;
 use pocketmine\player\Player;
@@ -168,5 +171,22 @@ class Utils
             subject: self::getConfigValue("messages", "player-info-message"));
         $player->sendMessage($info);
         return $info;
+    }
+
+    public static function sendReportWebhook(string $reporter, string $reportedPlayer, string $reason): void
+    {
+        $webhookURL = self::getConfigValue("settings", "webhook-url");
+        $webhook = new DiscordWebhook($webhookURL);
+        $message = new Message();
+        $message->setUsername(self::getConfigValue("settings", "webhook-username"));
+        $message->setContent(self::getConfigValue("settings", "webhook-content"));
+        $embed = new Embed();
+        $embed->setTitle(self::getConfigValue("settings", "webhook-title"));
+        $embed->addField(self::getConfigValue("settings", "webhook-reporter"), $reporter);
+        $embed->addField(self::getConfigValue("settings", "webhook-reported"), $reportedPlayer);
+        $embed->addField(self::getConfigValue("settings", "webhook-reason"), $reason);
+        $embed->setColor(0xFF0000);
+        $message->addEmbed($embed);
+        $webhook->send($message);
     }
 }

@@ -6,7 +6,9 @@ use Jorgebyte\BetterStaff\commands\BetterStaffCommand;
 use Jorgebyte\BetterStaff\commands\CheckTempBanCommand;
 use Jorgebyte\BetterStaff\commands\FreezeCommand;
 use Jorgebyte\BetterStaff\commands\PlayerInfoCommand;
+use Jorgebyte\BetterStaff\commands\ReportCommand;
 use Jorgebyte\BetterStaff\commands\StaffChatCommand;
+use Jorgebyte\BetterStaff\commands\StaffListCommand;
 use Jorgebyte\BetterStaff\commands\TempBanCommand;
 use Jorgebyte\BetterStaff\commands\UnTempBanCommand;
 use Jorgebyte\BetterStaff\events\ItemsEvent;
@@ -41,7 +43,9 @@ class Main extends PluginBase
             new TempBanCommand(),
             new UnTempBanCommand(),
             new CheckTempBanCommand(),
-            new PlayerInfoCommand()
+            new PlayerInfoCommand(),
+            new ReportCommand(),
+            new StaffListCommand()
         ];
         $this->getServer()->getCommandMap()->registerAll("BetterStaff", $commands);
     }

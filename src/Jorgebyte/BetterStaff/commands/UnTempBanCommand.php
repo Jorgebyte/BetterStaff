@@ -12,7 +12,7 @@ class UnTempBanCommand extends Command
 
     public function __construct()
     {
-        parent::__construct("untempban", "Unban the player", null, ["pardontemp", "removeban", "delban"]);
+        parent::__construct("untempban", "BetterStaff - Unban the player", null, ["pardontemp", "removeban", "delban"]);
         $this->setPermission("betterstaff.command.untempban");
         $this->setUsage("Usage: /untempban <player>");
     }

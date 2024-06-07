@@ -13,7 +13,7 @@ class TempBanCommand extends Command
 
     public function __construct()
     {
-        parent::__construct("tempban", "Temporarily ban a player", null, ["tban"]);
+        parent::__construct("tempban", "BetterStaff - Temporarily ban a player", null, ["tban"]);
         $this->setPermission("betterstaff.command.tempban");
         $this->setUsage("Usage: /tempban <player> <time> <reason>");
     }

@@ -90,6 +90,47 @@ class Forms
         $staff->sendForm($form);
     }
 
+    public static function customReportUI(Player $player): void
+    {
+        $onlinePlayers = Server::getInstance()->getOnlinePlayers();
+        $playerNames = [];
+        foreach ($onlinePlayers as $onlinePlayer) $playerNames[] = $onlinePlayer->getName();
+
+        $form = new CustomForm(function (Player $player, $data) use ($playerNames) {
+            if ($data === null) {
+                return;
+            }
+
+            $selectedPlayerIndex = (int)$data[0];
+            $reportedPlayerName = $playerNames[$selectedPlayerIndex];
+            $reportReason = $data[1];
+
+            if ($reportedPlayerName === "" || $reportReason === "") {
+                $player->sendMessage("ERROR: Be sure to provide a reason for the report.");
+                return;
+            }
+
+            if ($reportedPlayerName === $player->getName()) {
+                $player->sendMessage("ERROR: You cannot report yourself.");
+                return;
+            }
+
+            foreach (Server::getInstance()->getOnlinePlayers() as $staff) {
+                if ($staff->hasPermission("betterstaff.reportview")) {
+                    $staff->sendMessage(str_replace(["{PLAYER}", "{REPORTED}", "{REASON}"], [$player->getName(), $reportedPlayerName, $reportReason],
+                        Utils::getConfigValue("messages", "report-staff-success")));
+                    Utils::addSound($staff, "random.pop");
+                }
+            }
+            Utils::sendReportWebhook($player->getName(), $reportedPlayerName, $reportReason);
+        });
+
+        $form->setTitle("Report");
+        $form->addDropdown("Select a player to report", $playerNames);
+        $form->addInput("reason for the report");
+        $player->sendForm($form);
+    }
+
     public static function createSimpleForm(Player $player, string $title, string $content, array $playerNames, callable $selectionHandler): void
     {
         $form = new SimpleForm(function (Player $player, ?int $selectedPlayerIndex) use ($playerNames, $selectionHandler) {
