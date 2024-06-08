@@ -23,6 +23,10 @@ permissions:
     default: op
   betterstaff.stafflist:
     default: op
+  betterstaff.command.tempmute:
+    default: op
+  betterstaff.command.untempmute:
+    default: op
   betterstaff.command.report:
     default: true
   betterstaff.command.stafflist:

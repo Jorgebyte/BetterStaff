@@ -46,5 +46,4 @@ class StaffListCommand extends Command
         $sender->sendMessage($message);
         Utils::addSound($sender, "random.pop2");
     }
-
 }

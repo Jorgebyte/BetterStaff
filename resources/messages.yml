@@ -52,5 +52,10 @@ report-staff-success: "§7--------\n§e{PLAYER}§7 has reported to §c{REPORTED}
 stafflist-list: "§6Staffs Online: ({STAFFS})§7"
 no-staff-online: "§cThere are no staff members online."
 
-
-
+# Mute
+staff-mute-message: "§7You have muted §c{PLAYER} §7for §b{TIME}\n§7 Reason: §c{REASON}."
+broadcast-mute-message: "§e{PLAYER} §7has been muted by §r{STAFF} \n§7for §b{TIME}\n§7Reason: §c{REASON}."
+mute-message: "§cYou are muted for §b{TIME} §cReason: §c{REASON}."
+player-no-mute: "§e{PLAYER}§7 is not currently muted."
+player-check-mute: "\n§7--------\n§7Player:§e {PLAYER}\n§7Time:§b {TIME}\n§7Muted by:§c {STAFF}\n§7Reason:§c {REASON}\n§7--------"
+player-remove-mute: "§e{PLAYER}§a has been unmuted."

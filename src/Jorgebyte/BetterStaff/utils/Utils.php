@@ -4,6 +4,7 @@ namespace Jorgebyte\BetterStaff\utils;
 
 use Jorgebyte\BetterStaff\items\BanItem;
 use Jorgebyte\BetterStaff\items\FreezeItem;
+use Jorgebyte\BetterStaff\items\MuteItem;
 use Jorgebyte\BetterStaff\items\PlayerInfoItem;
 use Jorgebyte\BetterStaff\items\TeleportItem;
 use Jorgebyte\BetterStaff\items\VanishItem;
@@ -48,7 +49,7 @@ class Utils
 
     public static function setKitStaff(Player $player): void
     {
-        $player->getInventory()->setContents(array(0 => new TeleportItem(), 2 => new VanishItem(), 3 => new FreezeItem(), 4 => new BanItem(), 6 => new PlayerInfoItem()));
+        $player->getInventory()->setContents(array(0 => new TeleportItem(), 2 => new VanishItem(), 3 => new FreezeItem(), 4 => new BanItem(), 6 => new PlayerInfoItem(), 8 => new MuteItem()));
     }
 
     public static function toggleFreeze(Player $player, Player $victim): void

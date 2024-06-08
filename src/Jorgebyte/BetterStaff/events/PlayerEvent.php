@@ -3,10 +3,12 @@
 namespace Jorgebyte\BetterStaff\events;
 
 use Jorgebyte\BetterStaff\data\BanData;
+use Jorgebyte\BetterStaff\data\MuteData;
 use Jorgebyte\BetterStaff\session\StaffSession;
 use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\server\CommandEvent;
@@ -32,6 +34,26 @@ class PlayerEvent implements Listener
             $msg = str_replace(["{STAFF}", "{TIME}", "{REASON}"], [$staffName, $formatDuration, $reason],
                 $prefix . Utils::getConfigValue("messages", "login-player-ban"));
             $player->kick($msg);
+        }
+    }
+
+    public function onPlayerChat(PlayerChatEvent $event): void
+    {
+        $player = $event->getPlayer();
+        $muteData = MuteData::getInstance();
+
+        if ($muteData->isMuted($player->getName())) {
+            $muteInfo = $muteData->getMuteInfo($player->getName());
+            if ($muteInfo !== null) {
+                $remainingTime = $muteInfo['end_time'] - time();
+                $formatDuration = Utils::formatDuration($remainingTime);
+                $reason = $muteInfo['reason'];
+                $prefix = Utils::getPrefix();
+                $message = str_replace(["{TIME}", "{REASON}"], [$formatDuration, $reason],
+                    Utils::getConfigValue("messages", "mute-message"));
+                $player->sendMessage($prefix . $message);
+                $event->cancel();
+            }
         }
     }
 

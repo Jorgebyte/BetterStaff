@@ -5,10 +5,12 @@ namespace Jorgebyte\BetterStaff\events;
 use Jorgebyte\BetterStaff\Forms;
 use Jorgebyte\BetterStaff\items\BanItem;
 use Jorgebyte\BetterStaff\items\FreezeItem;
+use Jorgebyte\BetterStaff\items\MuteItem;
 use Jorgebyte\BetterStaff\items\PlayerInfoItem;
 use Jorgebyte\BetterStaff\items\TeleportItem;
 use Jorgebyte\BetterStaff\items\VanishItem;
 use Jorgebyte\BetterStaff\session\StaffSession;
+use Jorgebyte\BetterStaff\utils\Forms\Form;
 use Jorgebyte\BetterStaff\utils\Utils;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
@@ -33,6 +35,9 @@ class ItemsEvent implements Listener
                     break;
                 case $item instanceof BanItem:
                     Forms::customBanUI($player);
+                    break;
+                case $item instanceof MuteItem:
+                    Forms::customMuteUI($player);
                     break;
                 case $item instanceof VanishItem:
                     if (StaffSession::isVanish($player)) {
