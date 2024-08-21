@@ -60,9 +60,10 @@ class ItemsListener implements Listener
         $damager = $event->getDamager();
         $victim = $event->getEntity();
 
-        if (!$damager instanceof Player) {
-            return;
-        }
+        if (!$damager instanceof Player) return;
+
+        if (!$victim instanceof Player) return;
+
         $itemInHand = $damager->getInventory()->getItemInHand();
         if ($itemInHand instanceof FreezeItem) {
             PlayerUtils::toggleFreeze($damager, $victim);
