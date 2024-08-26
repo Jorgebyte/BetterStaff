@@ -33,7 +33,7 @@ class PlayerUtils
     public static function toggleFreeze(Player $player, Player $victim): void
     {
         $prefix = ConfigUtils::getPrefix();
-        $session = SessionManager::getSession($player, 'freeze');
+        $session = SessionManager::getSession($victim, 'freeze');
         if ($session !== null) {
             SessionManager::endSession($victim, 'freeze');
             $player->sendMessage(str_replace("{PLAYER}", $victim->getName(), $prefix . ConfigUtils::getConfigValue("messages", "unfreeze-player")));
