@@ -19,7 +19,6 @@ class VanishSession extends Session
             if ($onlinePlayer !== $player) {
                 $onlinePlayer->hidePlayer($player);
                 $player->setSilent();
-                $player->setInvisible();
             }
         }
     }
