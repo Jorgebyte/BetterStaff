@@ -5,7 +5,7 @@ commands-block:
   - ec
 
 
-webhook_url: "https://discord.com/api/webhooks/1248480894247764109/4tZ8lqeCzqemGv7peyWB30lkxaq56SP31QFWf4xrmqmPmEyyRXgFLU7_kxAe-kl6R58x"
+webhook-url: "https://discord.com/api/webhooks/1248480894247764109/4tZ8lqeCzqemGv7peyWB30lkxaq56SP31QFWf4xrmqmPmEyyRXgFLU7_kxAe-kl6R58x"
 webhook-username: "Reports"
 webhook-content: "New Report!!!"
 webhook-title: "Player Report"
