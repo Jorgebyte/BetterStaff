@@ -25,6 +25,7 @@ class DiscordWebhook
 
     public function send(Message $message): void
     {
-        Server::getInstance()->getAsyncPool()->submitTask(new DiscordWebhookSendTask($this, $message));
+        $messageJson = json_encode($message);
+        Server::getInstance()->getAsyncPool()->submitTask(new DiscordWebhookSendTask($this->url, $messageJson));
     }
 }

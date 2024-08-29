@@ -52,5 +52,4 @@ class Message implements \JsonSerializable
     {
         return $this->data;
     }
-
 }

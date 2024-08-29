@@ -4,38 +4,40 @@ namespace Jorgebyte\BetterStaff\utils\webhook;
 
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use pocketmine\thread\NonThreadSafeValue;
 
 class DiscordWebhookSendTask extends AsyncTask
 {
 
-    protected NonThreadSafeValue $webhook;
-    protected NonThreadSafeValue $message;
+    protected $webhookUrl;
+    protected $messageJson;
 
-    public function __construct(DiscordWebhook $webhook, Message $message)
+    public function __construct(string $webhookUrl, string $messageJson)
     {
-        $this->webhook = new NonThreadSafeValue($webhook);
-        $this->message = new NonThreadSafeValue($message);
+        $this->webhookUrl = $webhookUrl;
+        $this->messageJson = $messageJson;
     }
 
     public function onRun(): void
     {
-        $ch = curl_init($this->webhook->deserialize()->getURL());
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->message->deserialize()));
-        curl_setopt($ch, CURLOPT_POST,true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-        $this->setResult([curl_exec($ch), curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
-        curl_close($ch);
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $this->webhookUrl);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $this->messageJson);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $result = curl_exec($curl);
+        $responseCode = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+        curl_close($curl);
+        $this->setResult([$result, $responseCode]);
     }
 
     public function onCompletion(): void
     {
         $response = $this->getResult();
-        if(!in_array($response[1], [200, 204])){
-            Server::getInstance()->getLogger()->error("[DiscordWebhookAPI] Got error ({$response[1]}): " . $response[0]);
+        if (!in_array($response[1], [200, 204])) {
+            Server::getInstance()->getLogger()->error("Got error ({$response[1]}): " . $response[0]);
         }
     }
 }
