@@ -2,15 +2,19 @@
 
 namespace Jorgebyte\BetterStaff\commands\types;
 
-use Jorgebyte\BetterStaff\data\MuteData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\SoundUtils;
 use Jorgebyte\BetterStaff\utils\TimeUtils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 
-class CheckTempMuteCommand extends Command
+class CheckTempMuteCommand extends Command implements PluginOwned
 {
+    use PluginOwnedTrait;
+
     public function __construct()
     {
         parent::__construct("checktempmute", "BetterStaff - Check the mute status of the players", null, ["viewtempmute", "checkmute"]);
@@ -28,7 +32,7 @@ class CheckTempMuteCommand extends Command
         }
 
         $playerName = $args[0];
-        $muteData = MuteData::getInstance();
+        $muteData = Main::getInstance()->getMuteData();
         $muteInfo = $muteData->getMuteInfo($playerName);
         if (!$muteData->isMuted($playerName) || $muteInfo === null) {
             $messageKey = !$muteData->isMuted($playerName) ? "player-no-mute" : "error-player-check";

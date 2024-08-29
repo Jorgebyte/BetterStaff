@@ -6,9 +6,13 @@ use Jorgebyte\BetterStaff\forms\FormManager;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 
-class ReportCommand extends Command
+class ReportCommand extends Command implements PluginOwned
 {
+    use PluginOwnedTrait;
+
     public function __construct()
     {
         parent::__construct("report", "BetterStaff - Report");

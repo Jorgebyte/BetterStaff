@@ -2,7 +2,7 @@
 
 namespace Jorgebyte\BetterStaff\forms\types;
 
-use Jorgebyte\BetterStaff\data\MuteData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\TimeUtils;
 use pocketmine\player\Player;
@@ -30,7 +30,7 @@ class CustomMuteForm extends CustomForm
                 $reason = $data[5] ?? "";
 
                 $totalSeconds = $days * 86400 + $hours * 3600 + $minutes * 60 + $seconds;
-                $muteData = MuteData::getInstance();
+                $muteData = Main::getInstance()->getMuteData();
                 $formatDuration = TimeUtils::formatDuration($totalSeconds);
                 $staffName = $staff->getName();
                 $muteData->addMute($playerName, $totalSeconds, $reason, $staffName);

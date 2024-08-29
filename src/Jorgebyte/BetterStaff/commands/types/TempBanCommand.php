@@ -2,16 +2,19 @@
 
 namespace Jorgebyte\BetterStaff\commands\types;
 
-use Jorgebyte\BetterStaff\data\BanData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\SoundUtils;
 use Jorgebyte\BetterStaff\utils\TimeUtils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 use pocketmine\Server;
 
-class TempBanCommand extends Command
+class TempBanCommand extends Command implements PluginOwned
 {
+    use PluginOwnedTrait;
 
     public function __construct()
     {
@@ -41,7 +44,7 @@ class TempBanCommand extends Command
         }
 
         $staffName = $sender->getName();
-        $banData = BanData::getInstance();
+        $banData = Main::getInstance()->getBanData();
         $banData->addBan($playerName, $time, $reason, $staffName);
 
         $target = Server::getInstance()->getPlayerExact($playerName);

@@ -2,15 +2,19 @@
 
 namespace Jorgebyte\BetterStaff\commands\types;
 
-use Jorgebyte\BetterStaff\data\BanData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\SoundUtils;
 use Jorgebyte\BetterStaff\utils\TimeUtils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 
-class CheckTempBanCommand extends Command
+class CheckTempBanCommand extends Command implements PluginOwned
 {
+    use PluginOwnedTrait;
+
     public function __construct()
     {
         parent::__construct("checktempban", "BetterStaff - Check the banning of the players", null, ["viewtempban", "checkban"]);
@@ -28,7 +32,7 @@ class CheckTempBanCommand extends Command
         }
 
         $playerName = $args[0];
-        $banData = BanData::getInstance();
+        $banData = Main::getInstance()->getBanData();
         $banInfo = $banData->getBanInfo($playerName);
         if (!$banData->isBanned($playerName) || $banInfo === null) {
             $messageKey = !$banData->isBanned($playerName) ? "player-no-ban" : "error-player-check";

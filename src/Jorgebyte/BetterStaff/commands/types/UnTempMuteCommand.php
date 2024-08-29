@@ -2,14 +2,17 @@
 
 namespace Jorgebyte\BetterStaff\commands\types;
 
-use Jorgebyte\BetterStaff\data\MuteData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\SoundUtils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 
-class UnTempMuteCommand extends Command
+class UnTempMuteCommand extends Command implements PluginOwned
 {
+    use PluginOwnedTrait;
 
     public function __construct()
     {
@@ -29,7 +32,7 @@ class UnTempMuteCommand extends Command
         }
 
         $playerName = $args[0];
-        $muteData = MuteData::getInstance();
+        $muteData = Main::getInstance()->getMuteData();
         if (!$muteData->isMuted($playerName)) {
             $sender->sendMessage(str_replace("{PLAYER}", $playerName, $prefix . ConfigUtils::getConfigValue("messages", "player-no-mute")));
             SoundUtils::addSound($sender, "note.bass");

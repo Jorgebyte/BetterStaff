@@ -4,12 +4,11 @@ namespace Jorgebyte\BetterStaff\data;
 
 use Jorgebyte\BetterStaff\data\trait\DataTrait;
 use Jorgebyte\BetterStaff\Main;
-use pocketmine\utils\SingletonTrait;
 use SQLite3;
 
 class MuteData
 {
-    use SingletonTrait, DataTrait;
+    use DataTrait;
 
     private const CACHE_EXPIRATION = 300;
 

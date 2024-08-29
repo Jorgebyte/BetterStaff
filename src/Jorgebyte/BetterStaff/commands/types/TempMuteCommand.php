@@ -2,16 +2,19 @@
 
 namespace Jorgebyte\BetterStaff\commands\types;
 
-use Jorgebyte\BetterStaff\data\MuteData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\SoundUtils;
 use Jorgebyte\BetterStaff\utils\TimeUtils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 use pocketmine\Server;
 
-class TempMuteCommand extends Command
+class TempMuteCommand extends Command implements PluginOwned
 {
+    use PluginOwnedTrait;
 
     public function __construct()
     {
@@ -42,7 +45,7 @@ class TempMuteCommand extends Command
         }
 
         $staffName = $sender->getName();
-        $muteData = MuteData::getInstance();
+        $muteData = Main::getInstance()->getMuteData();
         $muteData->addMute($playerName, $time, $reason, $staffName);
 
         $formatDuration = TimeUtils::formatDuration($time);

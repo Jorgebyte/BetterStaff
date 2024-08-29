@@ -2,8 +2,7 @@
 
 namespace Jorgebyte\BetterStaff\listener;
 
-use Jorgebyte\BetterStaff\data\BanData;
-use Jorgebyte\BetterStaff\data\MuteData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\session\SessionManager;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\TimeUtils;
@@ -20,7 +19,7 @@ class PlayerListener implements Listener
     {
         $player = $event->getPlayer();
         $playerName = strtolower($player->getName());
-        $banData = BanData::getInstance();
+        $banData = Main::getInstance()->getBanData();
 
         if ($banData->isBanned($playerName)) {
             $banInfo = $banData->getBanInfo($playerName);
@@ -40,7 +39,7 @@ class PlayerListener implements Listener
     {
         $player = $event->getPlayer();
         $playerName = strtolower($player->getName());
-        $muteData = MuteData::getInstance();
+        $muteData = Main::getInstance()->getMuteData();
 
         if ($muteData->isMuted($playerName)) {
             $muteInfo = $muteData->getMuteInfo($playerName);

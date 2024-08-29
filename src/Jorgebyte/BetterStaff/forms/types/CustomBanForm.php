@@ -2,7 +2,7 @@
 
 namespace Jorgebyte\BetterStaff\forms\types;
 
-use Jorgebyte\BetterStaff\data\BanData;
+use Jorgebyte\BetterStaff\Main;
 use Jorgebyte\BetterStaff\utils\ConfigUtils;
 use Jorgebyte\BetterStaff\utils\TimeUtils;
 use pocketmine\player\Player;
@@ -30,7 +30,7 @@ class CustomBanForm extends CustomForm
                 $reason = $data[5] ?? "";
 
                 $totalSeconds = $days * 86400 + $hours * 3600 + $minutes * 60 + $seconds;
-                $banData = BanData::getInstance();
+                $banData = Main::getInstance()->getBanData();
                 $formatDuration = TimeUtils::formatDuration($totalSeconds);
                 $staffName = $staff->getName();
                 $banData->addBan($playerName, $totalSeconds, $reason, $staffName);

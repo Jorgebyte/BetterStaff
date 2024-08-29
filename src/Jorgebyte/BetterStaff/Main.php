@@ -8,6 +8,8 @@ use Jorgebyte\BetterStaff\listener\{
     PlayerListener,
     StaffListener
 };
+use Jorgebyte\BetterStaff\data\BanData;
+use Jorgebyte\BetterStaff\data\MuteData;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\SingletonTrait;
 
@@ -15,11 +17,22 @@ class Main extends PluginBase
 {
     use SingletonTrait;
 
+    public BanData $banData;
+    public MuteData $muteData;
+
     private const RESOURCES = [
         "itemnames.yml",
         "messages.yml",
         "settings.yml"
     ];
+
+    public function onLoad(): void
+    {
+        self::setInstance($this);
+
+        $this->banData = new BanData();
+        $this->muteData = new MuteData();
+    }
 
     public function onEnable(): void
     {
@@ -27,6 +40,16 @@ class Main extends PluginBase
         $this->saveResources();
         CommandManager::loadCommand();
         $this->registerListeners();
+    }
+
+    public function getBanData(): BanData
+    {
+        return $this->banData;
+    }
+
+    public function getMuteData(): MuteData
+    {
+        return $this->muteData;
     }
 
     private function saveResources(): void

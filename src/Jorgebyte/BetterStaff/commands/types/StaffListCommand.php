@@ -7,10 +7,13 @@ use Jorgebyte\BetterStaff\utils\SoundUtils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\plugin\PluginOwnedTrait;
 use pocketmine\Server;
 
-class StaffListCommand extends Command
+class StaffListCommand extends Command implements PluginOwned
 {
+    use PluginOwnedTrait;
 
     public function __construct()
     {
