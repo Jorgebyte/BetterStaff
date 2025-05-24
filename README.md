@@ -1,5 +1,7 @@
 # BetterStaff
 
+[![](https://poggit.pmmp.io/shield.api/BetterStaff)](https://poggit.pmmp.io/p/BetterStaff)
+
 BetterStaff is a powerful Pocketmine plugin designed to streamline moderation and enhance your server's management. Equip your moderators with a comprehensive toolkit that simplifies tasks and empowers them to effectively maintain order.
 
 # Commands
